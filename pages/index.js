@@ -7,8 +7,9 @@ export default function HomePage() {
   const [account, setAccount] = useState(undefined);
   const [atm, setATM] = useState(undefined);
   const [balance, setBalance] = useState(undefined);
+  const [count, getCount] = useState(undefined);
 
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
   const atmABI = atm_abi.abi;
 
   const getWallet = async() => {
@@ -55,21 +56,31 @@ export default function HomePage() {
 
   const getBalance = async() => {
     if (atm) {
-      setBalance((await atm.getBalance()).toNumber());
+      setBalance((await atm.getMessage()).toString());
     }
   }
 
-  const deposit = async() => {
+  const getcount = async() => {
     if (atm) {
-      let tx = await atm.deposit(1);
+      let id=prompt("Enter the item id");
+      setBalance((await atm.getItemCount(id)).toString());
+    }
+  }
+
+  const setitem = async() => {
+    if (atm) {
+      let name=prompt("Enter the item name");
+      let id=prompt("Enter the item id");
+      let tx = await atm.setItem(name,id);
       await tx.wait()
       getBalance();
     }
   }
 
-  const withdraw = async() => {
+  const getitem = async() => {
     if (atm) {
-      let tx = await atm.withdraw(1);
+      let id=prompt("Enter the item id");
+      let tx = await atm.getItem(id);
       await tx.wait()
       getBalance();
     }
@@ -93,9 +104,11 @@ export default function HomePage() {
     return (
       <div>
         <p>Your Account: {account}</p>
-        <p>Your Balance: {balance}</p>
-        <button onClick={deposit}>Deposit 1 ETH</button>
-        <button onClick={withdraw}>Withdraw 1 ETH</button>
+        <p>Message: {balance}</p>
+        
+        <button onClick={setitem}>Set Item</button>
+        <button onClick={getitem}>Get Item</button>
+        <button onClick={getcount}>Get Count</button>
       </div>
     )
   }
@@ -104,11 +117,12 @@ export default function HomePage() {
 
   return (
     <main className="container">
-      <header><h1>Welcome to the Metacrafters ATM!</h1></header>
+      <header><h1>Inventory</h1></header>
       {initUser()}
       <style jsx>{`
         .container {
-          text-align: center
+          text-align: center;
+          
         }
       `}
       </style>
