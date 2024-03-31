@@ -1,60 +1,30 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
-
-//import "hardhat/console.sol";
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 contract Assessment {
-    address payable public owner;
-    uint256 public balance;
+    mapping(uint256 => string) public item;
+    mapping(uint256 => uint256) public itemCount;
+    string public message;
 
-    event Deposit(uint256 amount);
-    event Withdraw(uint256 amount);
-
-    constructor(uint initBalance) payable {
-        owner = payable(msg.sender);
-        balance = initBalance;
+    constructor(string memory initMessage){
+        message=initMessage;
     }
 
-    function getBalance() public view returns(uint256){
-        return balance;
+    function getMessage() public view returns(string memory) {
+        return message;
     }
 
-    function deposit(uint256 _amount) public payable {
-        uint _previousBalance = balance;
-
-        // make sure this is the owner
-        require(msg.sender == owner, "You are not the owner of this account");
-
-        // perform transaction
-        balance += _amount;
-
-        // assert transaction completed successfully
-        assert(balance == _previousBalance + _amount);
-
-        // emit the event
-        emit Deposit(_amount);
+    function setItem(string memory item_name, uint256 item_id) public payable {
+        item[item_id] = item_name;
+        itemCount[item_id]++; 
+        message = "Item name has been mapped to item id";
     }
 
-    // custom error
-    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
+    function getItem(uint256 item_id) public {
+        message = item[item_id];
+    }
 
-    function withdraw(uint256 _withdrawAmount) public {
-        require(msg.sender == owner, "You are not the owner of this account");
-        uint _previousBalance = balance;
-        if (balance < _withdrawAmount) {
-            revert InsufficientBalance({
-                balance: balance,
-                withdrawAmount: _withdrawAmount
-            });
-        }
-
-        // withdraw the given amount
-        balance -= _withdrawAmount;
-
-        // assert the balance is correct
-        assert(balance == (_previousBalance - _withdrawAmount));
-
-        // emit the event
-        emit Withdraw(_withdrawAmount);
+    function getItemCount(uint256 item_id) public view returns (uint256) {
+        return itemCount[item_id]; 
     }
 }
